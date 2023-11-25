@@ -1,4 +1,5 @@
 import os
+import math
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
@@ -22,6 +23,14 @@ class GNSSParser:
     def __init__(self):
         self.target_data_ids = TARGET_DATA_ID.split(',')
         self.exclude_data_ids = EXCLUDE_DATA_ID.split(',')
+
+    @staticmethod
+    def parse_matrix_value(value: str) -> float:
+        value = float(value)
+        top = math.floor(value/100)
+        bottom = (value - top*100) / 60.0
+        return top + bottom
+        # 3655.9461は、36°+55.9461′だから、36+(55.9461/60)=36.932435
 
     def parse(self, gnss_raw_data: str) -> List[Dict]:
         """
@@ -212,6 +221,7 @@ class GNSSParser:
     def _parse_GPGGA(self, data_id, values, result):
         """
         GPGGAの解析
+        $GPGGA,%H%M%S.%f,3541.11442,N,13925.13800,E,1,08,1.07,64.4,M,38.9,M,,*6F
         :param data_id:
         :param values:
         :param result:
